@@ -32,12 +32,19 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
+            'tpdk_id' => ['required', 'exists:tpdk,id'],
         ])->validate();
 
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'tpdk_id' => $input['tpdk_id'],
+            'status' => 'pending',
         ]);
+
+        $user->assignRole('User');
+
+        return $user;
     }
 }

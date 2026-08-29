@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Role;
+namespace App\Http\Requests\Permission;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRoleRequest extends FormRequest
+class UpdatePermissionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,9 @@ class StoreRoleRequest extends FormRequest
      */
     public function rules(): array
     {
-
+        $permissionId = $this->route('permission')->id;
         return [
-            'name' => 'required|string|unique:roles,name',
+            'name' => 'required|string|unique:permissions,name,' . $permissionId,
         ];
     }
 }

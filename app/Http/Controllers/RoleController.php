@@ -7,7 +7,7 @@ use App\Http\Requests\Role\UpdateRoleRequest;
 use App\Services\RoleService;
 use Exception;
 use Illuminate\Http\Request;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -41,8 +41,8 @@ class RoleController extends Controller
             if ($request->expectsJson()) {
 
                 return response()->json([
-                    'succes' => 'false',
-                    'message' => 'gagal mengambil data'
+                    'success' => false,
+                    'message' => 'gagal mengambil data' . $e->getMessage(),
                 ], 500);
             }
 
@@ -114,7 +114,7 @@ class RoleController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Gagal mengambil data role',
+                    'message' => 'Gagal mengambil data role' . $e->getMessage(),
                 ], 500);
             }
 

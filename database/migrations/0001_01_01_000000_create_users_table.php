@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->foreignUuid('tpdk_id')->constrained('tpdk')->nullOnDelete();
+            $table->foreignUuid('tpdk_id')->nullable()->constrained('tpdk')->nullOnDelete();
             $table->enum('status', ['active', 'pending', 'rejected'])->default('pending');
             $table->rememberToken();
             $table->timestamps();

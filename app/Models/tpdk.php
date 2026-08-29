@@ -19,10 +19,10 @@ class tpdk extends Model
         'radius',
     ];
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'tpdk_user');
-    }
+    // public function users()
+    // {
+    //     return $this->belongsToMany(User::class, 'tpdk_user');
+    // }
 
     public function Attendance()
     {
@@ -31,7 +31,7 @@ class tpdk extends Model
 
     public function User_id()
     {
-        return $this->has(User::class);
+        return $this->hasMany(User::class);
     }
 
 

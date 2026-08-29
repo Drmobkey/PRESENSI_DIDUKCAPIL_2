@@ -9,7 +9,7 @@ class RoleService
 
     public function getAllRoles()
     {
-        return Role::all();
+        return Role::paginate(10);
     }
 
     public function createRole(array $data)

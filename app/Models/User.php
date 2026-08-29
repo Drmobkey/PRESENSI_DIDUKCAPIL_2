@@ -34,10 +34,10 @@ class User extends Authenticatable
 
 
 
-    public function Tpdk()
-    {
-        return $this->belongsToMany(tpdk::class, 'tpdk_user');
-    }
+    // public function Tpdk()
+    // {
+    //     return $this->belongsToMany(tpdk::class, 'tpdk_user');
+    // }
 
     public function Attendance()
     {

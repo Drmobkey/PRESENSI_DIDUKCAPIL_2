@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Requests\Role;
+namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRoleRequest extends FormRequest
+class StoreUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->hasRole('Superadmin');
+        return true;
     }
 
     /**
@@ -22,9 +22,13 @@ class StoreRoleRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
-            'name' => 'required|string|unique:roles,name',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'status' => 'sometimes|in:pending,approved,rejected',
+            'primary_tpdk_id' => 'required|exists:tpdk,id',
+            'role' => 'sometimes|exists:roles,name'
         ];
     }
 }

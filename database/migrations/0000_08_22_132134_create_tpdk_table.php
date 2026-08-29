@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('tpdk', function (Blueprint $table) {
+        Schema::create('tpdks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->decimal('latitude', 10, 8);
             $table->decimal('longitude', 11, 8);
