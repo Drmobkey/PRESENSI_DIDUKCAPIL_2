@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Hash;
 class UserService
 {
 
-    public function approveUser(User $user, array $Tpdk)
+    public function approveUser(User $user, string $tpdkId)
     {
-        $user->update(['status' => 'approved']);
-        $user->Tpdk()->sync($Tpdk);
+        $user->update([
+            'status' => 'approved',
+            'tpdk_id' => $tpdkId
+        ]);
 
         return $user;
 

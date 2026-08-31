@@ -36,21 +36,26 @@ class User extends Authenticatable
 
     // public function Tpdk()
     // {
-    //     return $this->belongsToMany(tpdk::class, 'tpdk_user');
+    //     return $this->belongsToMany(Tpdk::class, 'tpdk_user');
     // }
 
     public function Attendance()
     {
-        return $this->hasMany(attendance::class);
+        return $this->hasMany(Attendance::class);
     }
 
     public function Logbook()
     {
-        return $this->hasMany(logbook::class);
+        return $this->hasMany(Logbook::class);
     }
 
     public function primary_tpdk()
     {
-        return $this->belongsTo(tpdk::class);
+        return $this->belongsTo(Tpdk::class);
     }
+    public function leaves()
+    {
+        return $this->hasMany(Leave::class);
+    }
+
 }

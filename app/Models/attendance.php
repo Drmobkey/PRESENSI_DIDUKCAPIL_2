@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class attendance extends Model
+class Attendance extends Model
 {
     //
 
@@ -26,6 +26,7 @@ class attendance extends Model
             'long_in',
             'photo_in',
             'photo_out',
+            'status',
 
         ];
 
@@ -36,6 +37,6 @@ class attendance extends Model
 
     public function Tpdks()
     {
-        return $this->belongsTo(tpdk::class);
+        return $this->belongsTo(Tpdk::class);
     }
 }

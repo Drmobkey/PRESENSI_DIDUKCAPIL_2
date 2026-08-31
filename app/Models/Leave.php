@@ -5,20 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Logbook extends Model
+class Leave extends Model
 {
-    use HasFactory, HasUuids;
-    //
-    protected $table = 'logbooks';
+    use HasUuids, HasFactory, SoftDeletes;
+    protected $table = 'leaves';
 
     protected $fillable = [
         'user_id',
-        'date',
-        'description'
+        'type',
+        'start_date',
+        'end_date',
+        'reason',
+        'attachment',
+        'status'
     ];
 
-    public function User()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

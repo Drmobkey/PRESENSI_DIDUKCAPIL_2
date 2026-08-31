@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignUuid('tpdk_id')->nullable()->constrained('tpdk')->nullOnDelete();
-            $table->enum('status', ['active', 'pending', 'rejected'])->default('pending');
+            $table->enum('status', ['approved', 'pending', 'rejected'])->default('pending');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

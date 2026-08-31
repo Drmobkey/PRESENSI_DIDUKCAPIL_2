@@ -22,9 +22,7 @@ class UserController extends Controller
     public function approve(Request $request, User $user)
     {
         $request->validate([
-            'tpdk_id' => 'required|array',
-            'tpdk_id.*' => 'exists:tpdk,id',
-
+            'tpdk_id' => 'required|exists:tpdk,id',
         ]);
 
         try {
@@ -185,7 +183,7 @@ class UserController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('user.index')->with('success', 'User berhasil diperbarui');
+            return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
 
         } catch (\Exception $e) {
             Log::error('Error update user:' . $e->getMessage());
@@ -218,7 +216,7 @@ class UserController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('user.index')->with('success', 'User berhasil dihapus');
+            return redirect()->route('users.index')->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error delete user' . $e->getMessage());
 

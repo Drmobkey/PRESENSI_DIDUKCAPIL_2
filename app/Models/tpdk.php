@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class tpdk extends Model
+class Tpdk extends Model
 {
     use SoftDeletes, HasFactory, HasUuids;
     protected $table = 'tpdk';
@@ -17,6 +17,7 @@ class tpdk extends Model
         'latitude',
         'longitude',
         'radius',
+        'name'
     ];
 
     // public function users()
@@ -26,7 +27,7 @@ class tpdk extends Model
 
     public function Attendance()
     {
-        return $this->hasMany(attendance::class);
+        return $this->hasMany(Attendance::class);
     }
 
     public function User_id()

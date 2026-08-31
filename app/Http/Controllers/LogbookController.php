@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\LogbookService;
+use Illuminate\Http\Request;
+
+class LogbookController extends Controller
+{
+
+    protected $logbookService;
+
+    public function __construct(LogbookService $logbookService)
+    {
+        $this->logbookService = $logbookService;
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        try {
+            $logbooks = $this->logbookService->getLogbooks($request->user());
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'data' => $logbooks], 200);
+            }
+            return view('logbooks.index', compact('logbooks'));
+
+        } catch (\Exception $e) {
+            Log::error('Error get logbooks: ' . $e->getMessage());
+            return $this->handleError($request, 'Gagal mengambil data logbook.', 500);
+        }
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreLogbookRequest $request)
+    {
+        try {
+            $logbook = $this->logbookService->storeLogbook($request->user(), $request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'data' => $logbook], 201);
+            }
+            return redirect()->back()->with('success', 'Logbook hari ini berhasil disimpan.');
+        } catch (\Exception $e) {
+            Log::error('Error store logbook: ' . $e->getMessage());
+            return $this->handleError($request, 'Gagal menyimpan logbook.', 500);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Request $request, Logbook $logbook)
+    {
+        $user = $request->user();
+
+        // Proteksi URL: Cegah User A mengintip logbook User B
+        $isOwner = $logbook->user_id === $user->id;
+        $canViewAll = $user->can('view_all_data');
+
+        if (!$isOwner && !$canViewAll) {
+            return $this->handleError($request, 'Anda tidak memiliki akses melihat logbook ini.', 403);
+        }
+
+        try {
+            $logbook->load('user');
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'data' => $logbook], 200);
+            }
+            return view('logbooks.show', compact('logbook'));
+
+        } catch (\Exception $e) {
+            Log::error('Error show logbook: ' . $e->getMessage());
+            return $this->handleError($request, 'Gagal menampilkan detail logbook.', 500);
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateLogbookRequest $request, Logbook $logbook)
+    {
+        try {
+            $updatedLogbook = $this->logbookService->updateLogbook($logbook, $request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'data' => $updatedLogbook], 200);
+            }
+            return redirect()->back()->with('success', 'Logbook berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Error update logbook: ' . $e->getMessage());
+            return $this->handleError($request, 'Gagal memperbarui logbook.', 500);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Request $request, Logbook $logbook)
+    {
+        // Validasi ekstra: Hanya Superadmin/Admin atau Pemilik yang bisa menghapus
+        if (!$request->user()->can('view_all_data') && $logbook->user_id !== $request->user()->id) {
+            return $this->handleError($request, 'Akses ditolak.', 403);
+        }
+
+        try {
+            $this->logbookService->deleteLogbook($logbook);
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Logbook dihapus'], 200);
+            }
+            return redirect()->route('logbooks.index')->with('success', 'Logbook berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Error delete logbook: ' . $e->getMessage());
+            return $this->handleError($request, 'Gagal menghapus logbook.', 500);
+        }
+    }
+
+    private function handleError(Request $request, $message, $code)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['success' => false, 'message' => $message], $code);
+        }
+        return redirect()->back()->with('error', $message);
+    }
+}

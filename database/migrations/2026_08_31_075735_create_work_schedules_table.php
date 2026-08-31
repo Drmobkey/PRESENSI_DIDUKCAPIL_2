@@ -10,14 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('tpdk', function (Blueprint $table) {
+        Schema::create('work_schedules', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 11, 8);
-            $table->integer('radius');
+            $table->integer('day_of_week')->comment('0=Minggu, 1=Senin, dst');
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -26,6 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('tpdk');
+        Schema::dropIfExists('work_schedules');
     }
 };
