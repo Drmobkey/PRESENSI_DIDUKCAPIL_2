@@ -1,296 +1,118 @@
-# Panduan Lengkap Template Material Dashboard 2 Laravel
-### Sistem Informasi Presensi Disdukcapil
-
-Dokumen ini disusun sebagai panduan belajar dan referensi teknis dalam memahami, menggunakan, serta mengembangkan antarmuka (UI) menggunakan template **Material Dashboard 2 Laravel**.
-
----
-
-## Daftar Isi
-1. [Ringkasan Eksekutif & Identitas Template](#1-ringkasan-eksekutif--identitas-template)
-2. [Temuan Kritis: Aset pada Direktori Public](#2-temuan-kritis-aset-pada-direktori-public)
-3. [Peta dan Deskripsi Struktur Direktori](#3-peta-dan-deskripsi-struktur-direktori)
-4. [Arsitektur & Konsep Blade Component](#4-arsitektur--konsep-blade-component)
-5. [Tutorial Praktis: Membuat Halaman UI Baru](#5-tutorial-praktis-membuat-halaman-ui-baru)
-6. [Kustomisasi Menu Navigasi (Sidebar)](#6-kustomisasi-menu-navigasi-sidebar)
-7. [Cheat Sheet Desain UI (Kamus Kelas CSS)](#7-cheat-sheet-desain-ui-kamus-kelas-css)
-8. [Langkah Tindak Lanjut](#8-langkah-tindak-lanjut)
+# Panduan & Dokumentasi UI Template: Material Dashboard 2 (Laravel)
+**Aplikasi:** Presensi Disdukcapil  
+**Framework:** Laravel Blade + Bootstrap 5 + Material Dashboard 2  
 
 ---
 
-## 1. Ringkasan Eksekutif & Identitas Template
-
-* **Nama Template**: Material Dashboard 2 (Laravel Edition)
-* **Pengembang**: Creative Tim & UPDIVISION
-* **Basis Kerangka**: Bootstrap 5 + Laravel Blade Components
-* **Karakteristik Visual**:
-  * Sudut membulat (*border-radius* modern: `border-radius-xl`, `border-radius-lg`).
-  * Header kartu melayang di luar kontainer (*floating elevated headers* menggunakan `mt-n4`).
-  * Bayangan berwarna (*colored drop shadows* seperti `shadow-primary`, `shadow-success`).
-  * Aksen gradasi warna (*vibrant gradients*).
-  * Sistem ikon: **Google Material Icons** (`<i class="material-icons">...</i>`) dan **Font Awesome**.
+## 1. Ringkasan & Identitas Template
+Template yang Anda gunakan adalah **Material Dashboard 2 (Laravel Edition)** buatan Creative Tim & UPDIVISION.  
+Template ini dibangun di atas **Bootstrap 5** dengan gaya visual modern ala **Google Material Design 3** (sudut membulat, kartu melayang/floating shadows, gradient cerah, dan typography rapi).
 
 ---
 
-## 2. Temuan Kritis: Aset pada Direktori Public
+## 2. Struktur Direktori & Analisis File
 
-> [!CAUTION]
-> **Status Kelengkapan Aset**: Belum Lengkap!
-> Saat ini, folder `public/assets/` hanya memiliki file CSS dan file JS bawaan kosong (`app.js`, `bootstrap.js`). Script interaktif dan gambar pendukung belum tersalin.
+### A. Direktori `public/` (Aset Statis Web)
+Semua file yang bisa diakses langsung oleh browser publik ditaruh di sini:
 
-### Kondisi Saat Ini di `public/assets/`:
-* `public/assets/css/` : ✅ Lengkap (`material-dashboard.css`, `nucleo-icons.css`, `nucleo-svg.css`).
-* `public/assets/js/` : ❌ **Kurang folder `core/` dan `plugins/`**.
-* `public/assets/img/` : ❌ **Folder gambar belum ada**.
-
-### File yang Wajib Disalin dari Master Template Asli:
-1. **JavaScript Inti (`public/assets/js/`)**:
-   * `public/assets/js/core/popper.min.js` *(Untuk positioning dropdown & tooltip)*
-   * `public/assets/js/core/bootstrap.min.js` *(Komponen interaktif Bootstrap 5)*
-   * `public/assets/js/plugins/perfect-scrollbar.min.js` *(Scrollbar halus sidebar)*
-   * `public/assets/js/plugins/smooth-scrollbar.min.js`
-   * `public/assets/js/material-dashboard.min.js` *(Script kontrol utama tema)*
-2. **Gambar Aset (`public/assets/img/`)**:
-   * `logo-ct.png` (Logo default sidebar)
-   * `favicon.png` & `apple-icon.png`
-
-*Jika file-file di atas belum disalin, fungsi seperti buka-tutup dropdown profil, toggle menu mobile, dan scrollbar sidebar tidak akan merespons klik pengguna.*
+```
+public/assets/
+├── css/
+│   ├── material-dashboard.css      # CSS utama tema Material (modifikasi Bootstrap 5)
+│   ├── material-dashboard.min.css  # Versi ringkas/minified untuk produksi
+│   ├── nucleo-icons.css            # Font icon bawaan tema (Nucleo)
+│   └── nucleo-svg.css              # Ikon SVG pelengkap
+├── js/
+│   ├── core/
+│   │   ├── popper.min.js           # Penempatan tooltip & dropdown
+│   │   └── bootstrap.min.js        # Komponen interaktif Bootstrap 5 (modal, collapse, dropdown)
+│   ├── plugins/
+│   │   ├── perfect-scrollbar.min.js# Scrollbar kustom yang halus di sidebar & tabel
+│   │   ├── smooth-scrollbar.min.js # Pengatur animasi scroll
+│   │   └── chartjs.min.js          # Library grafik untuk dashboard
+│   ├── material-dashboard.min.js   # Script inisialisasi ripple effect, navbar blur, dsb.
+│   └── datatables.js / flatpickr.js# Library tabel & kalender tambahan
+└── img/
+    ├── logo-ct.png                 # Logo default pada sidebar
+    └── team-*.jpg / marie.jpg      # Contoh gambar avatar pengguna
+```
 
 ---
 
-## 3. Peta dan Deskripsi Struktur Direktori
+### B. Direktori `resources/views/` (Blade Template)
+Struktur Blade ini telah dirancang secara modular menggunakan **Laravel Blade Components** (`<x-...>`).
 
-### A. Direktori `resources/views/`
-```text
+```
 resources/views/
-├── components/                 # Komponen UI modular yang dapat digunakan berulang
-│   ├── layout.blade.php        # Wrapper HTML utama (head, meta, link css, slot body, script js)
-│   ├── plugins.blade.php       # Floating settings panel (pengaturan warna sidebar & dark mode)
+├── components/                     # [PENTING] Komponen modular yang dipakai berulang
+│   ├── layout.blade.php            # Master Layout (HTML wrapper: <head>, asset CSS/JS, body)
+│   ├── plugins.blade.php           # Floating sidebar setting (pengganti warna tema/dark mode)
 │   ├── footers/
-│   │   ├── auth.blade.php      # Footer di dalam dashboard pengguna
-│   │   └── guest.blade.php     # Footer untuk halaman publik / login
+│   │   ├── auth.blade.php          # Footer halaman setelah login
+│   │   └── guest.blade.php         # Footer halaman login/register
 │   └── navbars/
-│       ├── sidebar.blade.php   # Sidebar menu navigasi vertikal di sisi kiri
+│       ├── sidebar.blade.php       # Navigasi samping (menu utama)
 │       └── navs/
-│           ├── auth.blade.php  # Bar navigasi atas (breadcrumbs, search box, profile & notifikasi)
-│           └── guest.blade.php # Bar navigasi atas sederhana untuk halaman tamu
-│
+│           ├── auth.blade.php      # Topbar/Navbar atas saat login (search, profil, logout, breadcrumbs)
+│           └── guest.blade.php     # Topbar sederhana untuk halaman login/register
 ├── dashboard/
-│   └── index.blade.php         # Halaman utama: kartu statistik (KPI), grafik Chart.js, & tabel ringkas
-│
-├── pages/                      # Katalog referensi layout halaman
-│   ├── tables.blade.php        # Contoh tabel: daftar data dengan status badge & aksi edit
-│   ├── billing.blade.php       # Contoh kartu informasi, riwayat invoice, & transaksi
-│   ├── notifications.blade.php # Contoh alert, pop-up pesan, dan toast
-│   ├── profile.blade.php       # Contoh kartu profil pengguna, foto cover, & daftar proyek
-│   ├── rtl.blade.php           # Template tata letak Right-to-Left (opsional)
-│   └── laravel-examples/
-│       ├── user-management.blade.php # Contoh tabel CRUD pengelolaan user
-│       └── user-profile.blade.php    # Contoh form edit profil pengguna
-│
-├── register/
-│   └── create.blade.php        # Form pendaftaran akun baru
-│
-├── sessions/
-│   ├── create.blade.php        # Form login akun
-│   └── password/
-│       ├── reset.blade.php     # Form request link reset password
-│       └── verify.blade.php    # Form verifikasi token reset password
-│
-└── errors/                     # Halaman status HTTP (401, 403, 404, 419, 429, 500, 503)
+│   └── index.blade.php             # Contoh tampilan dashboard (kartu statistik & grafik)
+├── pages/                          # Contoh template halaman siap pakai
+│   ├── tables.blade.php            # Contoh tabel data list (CRUD)
+│   ├── profile.blade.php           # Contoh halaman profil user
+│   ├── notifications.blade.php     # Contoh alert & toast notifikasi
+│   └── laravel-examples/           # Contoh manajemen user bawaan template
+├── sessions/                       # Autentikasi
+│   ├── create.blade.php            # Halaman Login
+│   └── password/                   # Halaman Lupa & Reset Password
+└── register/
+    └── create.blade.php            # Halaman Register
 ```
 
 ---
 
-## 4. Arsitektur & Konsep Blade Component
+## 3. Cara Kerja Arsitektur Blade Component
 
-Template ini memanfaatkan paradigma **Laravel Blade Component** modern:
+Template ini tidak menggunakan `@extends('layouts.app')` konvensional, melainkan fitur modern Laravel yaitu **Blade Component Tag** (`<x-layout>`).
 
-### 1. Tag Komponen `<x-...>`
-Alih-alih menggunakan `@extends('layouts.app')` dan `@section('content')`, template membungkus tampilan dengan tag komponen:
-```blade
-<x-layout bodyClass="...">
-    <!-- Seluruh isi halaman diletakkan di sini -->
-</x-layout>
-```
-
-### 2. Slot (`{{ $slot }}`)
-Pada `layout.blade.php`, variabel `{{ $slot }}` berfungsi sebagai penampung konten apa pun yang Anda letakkan di dalam `<x-layout> ... </x-layout>`.
-
-### 3. Props (`@props([...])`)
-Komponen dapat menerima parameter dinamis:
-* Pada `layout.blade.php`: `@props(['bodyClass'])`
-  * Dashboard: `bodyClass="g-sidenav-show bg-gray-200"`
-  * Login/Register: `bodyClass="bg-gray-200"`
-* Pada `sidebar.blade.php`: `@props(['activePage'])`
-  * Menentukan menu mana yang diberi status aktif (gradasi warna menyala):
-    `activePage="attendances"`, `activePage="dashboard"`, dll.
-* Pada `navs.auth.blade.php`: `@props(['titlePage'])`
-  * Menentukan judul halaman pada breadcrumb navigasi atas:
-    `titlePage="Presensi Pegawai"`.
-
-### 4. Stack Script (`@push('js')` dan `@stack('js')`)
-Jika suatu halaman membutuhkan pustaka JavaScript khusus (misal Chart.js atau Leaflet peta TPDK), script ditaruh di dalam blok `@push('js')`:
-```blade
-@push('js')
-<script>
-    console.log("Script ini hanya berjalan pada halaman ini!");
-</script>
-@endpush
-```
+### Cara Kerja `<x-layout>`:
+1. File `resources/views/components/layout.blade.php` mendefinisikan kerangka HTML (Head, Tag CSS, Tag JS).
+2. Di dalam file tersebut terdapat variabel `{{ $slot }}`.
+3. Konten apa pun yang Anda tulis di antara pembuka `<x-layout>` dan penutup `</x-layout>` akan otomatis dimasukkan ke dalam `{{ $slot }}` tersebut.
 
 ---
 
-## 5. Tutorial Praktis: Membuat Halaman UI Baru
+## 4. Pola & Boilerplate Pembuatan Halaman Baru
 
-Berikut adalah template kode siap pakai untuk membuat halaman baru, misalnya **Daftar Presensi Pegawai** di `resources/views/attendances/index.blade.php`:
+Saat Anda ingin membuat halaman baru (misalnya halaman data **Presensi**, **Cuti / Leaves**, atau **Pengguna**), gunakan pola standar berikut:
 
-```blade
+```html
 <x-layout bodyClass="g-sidenav-show bg-gray-200">
-    <!-- 1. Menampilkan Sidebar (aktifkan menu presensi) -->
+    <!-- 1. Panggil Sidebar (tandai menu yang aktif) -->
     <x-navbars.sidebar activePage="attendances"></x-navbars.sidebar>
 
-    <!-- 2. Kontainer Utama -->
+    <!-- 2. Konten Utama -->
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
-        <!-- Navbar Atas -->
-        <x-navbars.navs.auth titlePage="Data Presensi Pegawai"></x-navbars.navs.auth>
+        
+        <!-- Topbar Navbar -->
+        <x-navbars.navs.auth titlePage="Data Presensi"></x-navbars.navs.auth>
 
+        <!-- Container Isi Halaman -->
         <div class="container-fluid py-4">
             
-            <!-- BAGIAN 1: KARTU REKAPITULASI (METRIC CARDS) -->
-            <div class="row mb-4">
-                <!-- Kartu Hadir -->
-                <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                    <div class="card">
-                        <div class="card-header p-3 pt-2">
-                            <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
-                                <i class="material-icons opacity-10">check_circle</i>
-                            </div>
-                            <div class="text-end pt-1">
-                                <p class="text-sm mb-0 text-capitalize">Hadir Hari Ini</p>
-                                <h4 class="mb-0">128</h4>
-                            </div>
-                        </div>
-                        <hr class="dark horizontal my-0">
-                        <div class="card-footer p-3">
-                            <p class="mb-0"><span class="text-success text-sm font-weight-bolder">92% </span>Tingkat kehadiran</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kartu Terlambat -->
-                <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                    <div class="card">
-                        <div class="card-header p-3 pt-2">
-                            <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
-                                <i class="material-icons opacity-10">schedule</i>
-                            </div>
-                            <div class="text-end pt-1">
-                                <p class="text-sm mb-0 text-capitalize">Terlambat</p>
-                                <h4 class="mb-0">8</h4>
-                            </div>
-                        </div>
-                        <hr class="dark horizontal my-0">
-                        <div class="card-footer p-3">
-                            <p class="mb-0 text-secondary text-sm">Toleransi s/d 08:00 WIB</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kartu Izin / Cuti -->
-                <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-                    <div class="card">
-                        <div class="card-header p-3 pt-2">
-                            <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
-                                <i class="material-icons opacity-10">flight_takeoff</i>
-                            </div>
-                            <div class="text-end pt-1">
-                                <p class="text-sm mb-0 text-capitalize">Cuti / Izin</p>
-                                <h4 class="mb-0">4</h4>
-                            </div>
-                        </div>
-                        <hr class="dark horizontal my-0">
-                        <div class="card-footer p-3">
-                            <p class="mb-0 text-secondary text-sm">Disetujui atasan</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kartu Tanpa Keterangan -->
-                <div class="col-xl-3 col-sm-6">
-                    <div class="card">
-                        <div class="card-header p-3 pt-2">
-                            <div class="icon icon-lg icon-shape bg-gradient-danger shadow-danger text-center border-radius-xl mt-n4 position-absolute">
-                                <i class="material-icons opacity-10">cancel</i>
-                            </div>
-                            <div class="text-end pt-1">
-                                <p class="text-sm mb-0 text-capitalize">Alpha</p>
-                                <h4 class="mb-0">0</h4>
-                            </div>
-                        </div>
-                        <hr class="dark horizontal my-0">
-                        <div class="card-footer p-3">
-                            <p class="mb-0 text-secondary text-sm">Status terkonfirmasi</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BAGIAN 2: TABEL DATA PRESENSI -->
+            <!-- TARUH KONTEN ANDA DI SINI (Card, Tabel, Form, dll) -->
             <div class="row">
                 <div class="col-12">
                     <div class="card my-4">
                         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 px-3 d-flex justify-content-between align-items-center">
-                                <h6 class="text-white text-capitalize ps-3 mb-0">Catatan Kehadiran Harian Pegawai</h6>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-outline-white mb-0">Export Excel</button>
-                                    <button class="btn btn-sm btn-white mb-0">+ Input Manual</button>
-                                </div>
+                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                <h6 class="text-white text-capitalize ps-3">Daftar Presensi Pegawai</h6>
                             </div>
                         </div>
                         <div class="card-body px-0 pb-2">
                             <div class="table-responsive p-0">
                                 <table class="table align-items-center mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pegawai</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Jam Masuk</th>
-                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Jam Pulang</th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lokasi / TPDK</th>
-                                            <th class="text-secondary opacity-7"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-3 py-1">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">Ahmad Fauzi, S.Kom</h6>
-                                                        <p class="text-xs text-secondary mb-0">NIP: 199008122018021002</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">07:42:15 WIB</p>
-                                                <span class="text-xxs text-success"><i class="fa fa-check"></i> Tepat Waktu</span>
-                                            </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">16:30:10 WIB</p>
-                                            </td>
-                                            <td class="align-middle text-center text-sm">
-                                                <span class="badge badge-sm bg-gradient-success">Hadir</span>
-                                            </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">TPDK Kec. Sukmajaya</span>
-                                            </td>
-                                            <td class="align-middle text-center">
-                                                <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Detail presensi">
-                                                    <i class="material-icons text-sm">visibility</i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
+                                    ...
                                 </table>
                             </div>
                         </div>
@@ -298,160 +120,95 @@ Berikut adalah template kode siap pakai untuk membuat halaman baru, misalnya **D
                 </div>
             </div>
 
-            <!-- Footer Halaman -->
+            <!-- Footer -->
             <x-footers.auth></x-footers.auth>
         </div>
     </main>
 
-    <!-- Panel Pengaturan Tema -->
+    <!-- Opsional: Konfigurator tema -->
     <x-plugins></x-plugins>
+
+    <!-- Script khusus untuk halaman ini (jika ada) -->
+    @push('js')
+    <script>
+        // JS khusus halaman ini
+    </script>
+    @endpush
 </x-layout>
 ```
 
 ---
 
-## 6. Kustomisasi Menu Navigasi (Sidebar)
+## 5. Cheat Sheet Komponen UI Penting
 
-File: `resources/views/components/navbars/sidebar.blade.php`
-
-Sesuaikan menu agar selaras dengan route yang sudah ada di `routes/web.php` (Presensi, Cuti, Logbook, TPDK, Pengguna):
-
-```blade
-<ul class="navbar-nav">
-    <!-- Header Bagian Utama -->
-    <li class="nav-item mt-3">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Menu Utama</h6>
-    </li>
-
-    <!-- 1. Dashboard -->
-    <li class="nav-item">
-        <a class="nav-link text-white {{ $activePage == 'dashboard' ? ' active bg-gradient-primary' : '' }}"
-            href="{{ route('dashboard') }}">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">dashboard</i>
-            </div>
-            <span class="nav-link-text ms-1">Dashboard</span>
-        </a>
-    </li>
-
-    <!-- 2. Presensi Pegawai -->
-    <li class="nav-item">
-        <a class="nav-link text-white {{ $activePage == 'attendances' ? ' active bg-gradient-primary' : '' }}"
-            href="{{ route('attendances.index') }}">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">fact_check</i>
-            </div>
-            <span class="nav-link-text ms-1">Presensi Pegawai</span>
-        </a>
-    </li>
-
-    <!-- 3. Pengajuan Cuti / Izin -->
-    <li class="nav-item">
-        <a class="nav-link text-white {{ $activePage == 'leaves' ? ' active bg-gradient-primary' : '' }}"
-            href="{{ route('leaves.index') }}">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">event_busy</i>
-            </div>
-            <span class="nav-link-text ms-1">Pengajuan Cuti</span>
-        </a>
-    </li>
-
-    <!-- 4. Logbook Harian -->
-    <li class="nav-item">
-        <a class="nav-link text-white {{ $activePage == 'logbooks' ? ' active bg-gradient-primary' : '' }}"
-            href="{{ route('logbooks.index') }}">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">menu_book</i>
-            </div>
-            <span class="nav-link-text ms-1">Logbook Harian</span>
-        </a>
-    </li>
-
-    <!-- Header Bagian Master Data -->
-    <li class="nav-item mt-3">
-        <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Master Data</h6>
-    </li>
-
-    <!-- 5. Data TPDK -->
-    <li class="nav-item">
-        <a class="nav-link text-white {{ $activePage == 'tpdks' ? ' active bg-gradient-primary' : '' }}"
-            href="{{ route('tpdks.index') }}">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">location_city</i>
-            </div>
-            <span class="nav-link-text ms-1">Data TPDK</span>
-        </a>
-    </li>
-
-    <!-- 6. Manajemen Pengguna -->
-    <li class="nav-item">
-        <a class="nav-link text-white {{ $activePage == 'users' ? ' active bg-gradient-primary' : '' }}"
-            href="{{ route('setup.users.index') }}">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">manage_accounts</i>
-            </div>
-            <span class="nav-link-text ms-1">Pengguna & Role</span>
-        </a>
-    </li>
-</ul>
-```
-
----
-
-## 7. Cheat Sheet Desain UI (Kamus Kelas CSS)
-
-### A. Palet Gradasi Warna
-Gunakan pada header card, tombol, icon shape, atau badge:
-* `bg-gradient-primary` : Magenta / Ungu khas Material Design
-* `bg-gradient-success` : Hijau (untuk status hadir, simpan, sukses)
-* `bg-gradient-warning` : Oranye (untuk status peringatan, terlambat, pending)
-* `bg-gradient-danger`  : Merah (untuk hapus, batal, alpha)
-* `bg-gradient-info`    : Biru Muda (untuk info, detail, catatan)
-* `bg-gradient-dark`    : Hitam Elegan (untuk navigasi dan kartu netral)
-
-### B. Anatomi Header Melayang (*Floating Card Header*)
-Ciri khas utama template ini adalah header kartu yang melayang ke atas:
+### A. Kartu Ringkasan / Metrik (Metric Card)
+Digunakan untuk menampilkan total hadir, izin, sakit, dsb:
 ```html
-<div class="card">
-    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-        <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 px-3">
-            <h6 class="text-white mb-0">Judul Card</h6>
+<div class="col-xl-3 col-sm-6 mb-4">
+    <div class="card">
+        <div class="card-header p-3 pt-2">
+            <!-- Icon Melayang (Floating Icon) -->
+            <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">done_all</i>
+            </div>
+            <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Hadir Hari Ini</p>
+                <h4 class="mb-0">128 Pegawai</h4>
+            </div>
         </div>
-    </div>
-    <div class="card-body">
-        <!-- Konten card -->
+        <hr class="dark horizontal my-0">
+        <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-success text-sm font-weight-bolder">95% </span>tingkat kehadiran</p>
+        </div>
     </div>
 </div>
 ```
-* `mt-n4`: Margin top minus 4 (mengangkat header ke atas melebihi batas body kartu).
-* `z-index-2`: Memastikan header berada di lapisan terdepan.
-* `border-radius-lg`: Membuat sudut header melengkung serasi dengan kartu.
 
-### C. Badge Status
+### B. Input Form (Material Outline Style)
+Material Dashboard menggunakan efek floating label khusus.  
+*Penting: Tambahkan class `is-filled` jika input sudah ada nilainya (misal saat form edit/old input).*
 ```html
-<span class="badge badge-sm bg-gradient-success">Hadir</span>
-<span class="badge badge-sm bg-gradient-warning">Izin</span>
-<span class="badge badge-sm bg-gradient-danger">Alpha</span>
+<div class="input-group input-group-outline my-3 {{ old('name') ? 'is-filled' : '' }}">
+    <label class="form-label">Nama Lengkap</label>
+    <input type="text" name="name" class="form-control" value="{{ old('name') }}">
+</div>
 ```
 
-### D. Ikon Google Material
-Cukup panggil nama icon di dalam tag `<i>`:
+### C. Tombol dengan Warna Gradient
+Tersedia beragam variasi gradient:
 ```html
-<i class="material-icons">dashboard</i>
-<i class="material-icons">person</i>
-<i class="material-icons">schedule</i>
-<i class="material-icons">check_circle</i>
-<i class="material-icons">location_on</i>
-<i class="material-icons">settings</i>
+<button class="btn bg-gradient-primary">Simpan (Primary)</button>
+<button class="btn bg-gradient-info">Info / Detail</button>
+<button class="btn bg-gradient-success">Setujui / Approve</button>
+<button class="btn bg-gradient-danger">Tolak / Hapus</button>
+<button class="btn bg-gradient-warning">Peringatan</button>
+<button class="btn bg-gradient-dark">Kembali / Batal</button>
+```
+
+### D. Badge Status
+Bagus untuk status absensi atau permohonan cuti:
+```html
+<span class="badge badge-sm bg-gradient-success">Tepat Waktu</span>
+<span class="badge badge-sm bg-gradient-warning">Terlambat</span>
+<span class="badge badge-sm bg-gradient-danger">Alpha</span>
+<span class="badge badge-sm bg-gradient-info">Izin / Cuti</span>
 ```
 
 ---
 
-## 8. Langkah Tindak Lanjut
+## 6. Tips Menyesuaikan Template untuk Presensi Disdukcapil
 
-1. **Lengkapi Aset Script & Gambar**:
-   Salin folder `core/` dan `plugins/` ke `public/assets/js/`, serta folder `img/` ke `public/assets/img/`.
-2. **Kustomisasi Sidebar**:
-   Ganti link dan icon pada `resources/views/components/navbars/sidebar.blade.php`.
-3. **Mulai Susun View Presensi**:
-   Gunakan struktur contoh di Bab 5 untuk membuat tampilan index, form pengajuan cuti, dan laporan logbook.
+1. **Ubah Menu Sidebar di `resources/views/components/navbars/sidebar.blade.php`**:
+   - Ganti menu contoh ("Tables", "Billing", "Virtual Reality") dengan menu sistem Anda:
+     - **Dashboard**: `route('dashboard')`
+     - **Presensi Pegawai**: `route('attendances.index')`
+     - **Pengajuan Cuti**: `route('leaves.index')`
+     - **Logbook Harian**: `route('logbooks.index')`
+     - **Kelola Pengguna**: `route('setup.users.index')`
+     - **Kelola Role**: `route('setup.roles.index')`
+2. **Ganti Logo & Judul Branding**:
+   - Buka `resources/views/components/navbars/sidebar.blade.php` baris 9–12.
+   - Ganti teks *"Material Dashboard 2"* dengan *"Presensi Disdukcapil"*.
+   - Ganti logo `asset('assets/img/logo-ct.png')` dengan logo Kabupaten / Disdukcapil di folder `public/assets/img/`.
+3. **Menambahkan CSS/JS Tambahan (misal Peta GPS / Leaflet)**:
+   - Gunakan `@push('js')` di bagian bawah file view Anda agar script otomatis dieksekusi setelah Bootstrap & jQuery dimuat.
