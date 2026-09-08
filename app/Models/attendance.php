@@ -30,13 +30,20 @@ class Attendance extends Model
 
         ];
 
-    public function User()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function Tpdks()
+    public function tpdk()
     {
-        return $this->belongsTo(Tpdk::class);
+        return $this->belongsTo(Tpdk::class, 'tpdk_id');
+    }
+
+    public function getLogbookAttribute()
+    {
+        return Logbook::where('user_id', $this->user_id)
+            ->whereDate('date', $this->date)
+            ->first();
     }
 }

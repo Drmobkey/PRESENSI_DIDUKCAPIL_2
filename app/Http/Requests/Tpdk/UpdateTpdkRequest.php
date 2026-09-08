@@ -24,6 +24,7 @@ class UpdateTpdkRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
+            'alamat' => 'sometimes|required|string',
             'latitude' => 'sometimes|required|numeric|between:-90,90',
             'longitude' => 'sometimes|required|numeric|between:-180,180',
             'radius' => 'sometimes|required|integer|min:1',

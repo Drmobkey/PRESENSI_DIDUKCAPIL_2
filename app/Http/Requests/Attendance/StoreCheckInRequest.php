@@ -24,7 +24,7 @@ class StoreCheckInRequest extends FormRequest
     {
         return [
             'latitude' => 'required|numeric',
-            'longitud' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'photo_in' => 'required|image|max:2048'
         ];
     }

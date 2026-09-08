@@ -24,6 +24,7 @@ class StoreTpdkRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'alamat' => 'required|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'radius' => 'required|integer|min:1',

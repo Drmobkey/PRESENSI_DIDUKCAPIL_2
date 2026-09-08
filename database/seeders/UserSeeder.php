@@ -14,21 +14,18 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $faker = \Faker\Factory::create('id_ID');
+        
         $roleAdmin = Role::firstOrCreate(['name' => 'Admin']);
         $roleUser = Role::firstOrCreate(['name' => 'User']);
 
-        $tpdk = \App\Models\Tpdk::firstOrCreate([
-            'name' => 'TPDK Kecamatan A',
-        ], [
-            'latitude' => -6.210000, 
-            'longitude' => 106.820000, 
-            'radius' => 50
-        ]);
+        $tpdk = \App\Models\Tpdk::first();
 
+        // Main Admin
         $admin = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
-                'name' => 'Admin TPDK A',
+                'name' => 'Admin TPDK Pusat',
                 'password' => Hash::make('password'),
                 'status' => 'approved',
                 'tpdk_id' => $tpdk->id,
@@ -36,15 +33,31 @@ class UserSeeder extends Seeder
         );
         $admin->assignRole($roleAdmin);
 
+        // Main User
         $pegawai = User::firstOrCreate(
             ['email' => 'user@gmail.com'],
             [
-                'name' => 'Pegawai TPDK A',
+                'name' => 'Pegawai TPDK Pusat',
                 'password' => Hash::make('password'),
                 'status' => 'approved',
                 'tpdk_id' => $tpdk->id,
             ]
         );
         $pegawai->assignRole($roleUser);
+
+        // Get all TPDK IDs
+        $tpdkIds = \App\Models\Tpdk::pluck('id')->toArray();
+
+        // Generate 50 random users
+        for ($i = 0; $i < 50; $i++) {
+            $randomUser = User::create([
+                'name' => $faker->name,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('password'),
+                'status' => $faker->randomElement(['approved', 'pending']),
+                'tpdk_id' => $faker->randomElement($tpdkIds)
+            ]);
+            $randomUser->assignRole($roleUser);
+        }
     }
 }

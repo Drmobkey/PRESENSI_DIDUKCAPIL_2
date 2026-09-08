@@ -85,7 +85,7 @@ class TpdkController extends Controller
                 ], 200);
             }
 
-            return view('tpdk.show', compact('tpdk'));
+            return view('tpdk.show', compact('tpdks'));
         } catch (\Exception $e) {
             Log::error('Error show TPDK: ' . $e->getMessage());
             return $this->handleError($request, 'Gagal memuat detail TPDK.', 500);
@@ -116,7 +116,7 @@ class TpdkController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('tpdk.index')->with('success', 'Data TPDK berhasil diperbarui');
+            return redirect()->route('tpdks.index')->with('success', 'Data TPDK berhasil diperbarui');
         } catch (\Exception $e) {
             Log::error('Error update TPDK: ' . $e->getMessage());
             return $this->handleError($request, 'Gagal memperbarui TPDK: ' . $e->getMessage(), 500);
@@ -138,7 +138,7 @@ class TpdkController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('tpdk.index')->with('success', 'Data TPDK berhasil dihapus');
+            return redirect()->route('tpdks.index')->with('success', 'Data TPDK berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error delete TPDK: ' . $e->getMessage());
             return $this->handleError($request, $e->getMessage(), 400);

@@ -101,8 +101,18 @@ class LogbookController extends Controller
      */
     public function update(UpdateLogbookRequest $request, Logbook $logbook)
     {
+        if ($logbook->status === 'approved') {
+            return $this->handleError($request, 'Logbook yang sudah disetujui tidak dapat diedit.', 403);
+        }
+
         try {
-            $updatedLogbook = $this->logbookService->updateLogbook($logbook, $request->validated());
+            $validated = $request->validated();
+            if ($logbook->status === 'revision') {
+                $validated['status'] = 'pending';
+                $validated['rejection_note'] = null;
+            }
+
+            $updatedLogbook = $this->logbookService->updateLogbook($logbook, $validated);
 
             if ($request->expectsJson()) {
                 return response()->json(['success' => true, 'data' => $updatedLogbook], 200);
@@ -124,6 +134,10 @@ class LogbookController extends Controller
             return $this->handleError($request, 'Akses ditolak.', 403);
         }
 
+        if ($logbook->status !== 'pending' && !$request->user()->can('view_all_data')) {
+            return $this->handleError($request, 'Hanya logbook dengan status pending yang dapat dihapus.', 403);
+        }
+
         try {
             $this->logbookService->deleteLogbook($logbook);
 
@@ -134,6 +148,29 @@ class LogbookController extends Controller
         } catch (\Exception $e) {
             Log::error('Error delete logbook: ' . $e->getMessage());
             return $this->handleError($request, 'Gagal menghapus logbook.', 500);
+        }
+    }
+
+    public function updateStatus(Request $request, Logbook $logbook)
+    {
+        if (!$request->user()->can('view_all_data')) {
+            return $this->handleError($request, 'Akses ditolak.', 403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:approved,revision',
+            'rejection_note' => 'nullable|string'
+        ]);
+
+        try {
+            $logbook->update([
+                'status' => $request->status,
+                'rejection_note' => $request->status === 'revision' ? $request->rejection_note : null
+            ]);
+            return redirect()->back()->with('success', 'Status logbook berhasil diperbarui.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error update status logbook: ' . $e->getMessage());
+            return $this->handleError($request, 'Gagal memperbarui status.', 500);
         }
     }
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Attendance;
 use App\Models\Logbook;
+use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -89,20 +90,37 @@ class AttendanceService
         });
     }
 
-    public function getAttendances($user)
+    public function getAttendances($user, array $filters = [])
     {
         // Eager load relasi user dan tpdk untuk detail lengkap
         $query = Attendance::with(['user', 'tpdk']);
 
         // Jika user adalah Admin / Superadmin (memiliki permission view_all_data)
-        if ($user->can('attendances.view_all')) {
-            return $query->latest()->get();
-            // Admin langsung melihat seluruh presensi dari semua TPDK
+        if (!$user->can('attendances.view_all')) {
+            // Jika user biasa, hanya melihat miliknya sendiri
+            $query->where('user_id', $user->id);
+        } else {
+            if (!empty($filters['user_id'])) {
+                $query->where('user_id', $filters['user_id']);
+            }
         }
 
-        // Jika user biasa, hanya melihat miliknya sendiri
-        return $query->where('user_id', $user->id)->latest()->get();
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('date', '>=', $filters['start_date']);
+        }
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('date', '<=', $filters['end_date']);
+        }
 
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['tpdk_id'])) {
+            $query->where('tpdk_id', $filters['tpdk_id']);
+        }
+
+        return $query->latest()->paginate(10)->withQueryString();
     }
 
 

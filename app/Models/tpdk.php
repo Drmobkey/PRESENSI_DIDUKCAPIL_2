@@ -17,7 +17,7 @@ class Tpdk extends Model
         'latitude',
         'longitude',
         'radius',
-        'name'
+        'alamat'
     ];
 
     // public function users()

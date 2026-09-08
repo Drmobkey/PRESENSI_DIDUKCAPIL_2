@@ -28,5 +28,24 @@ class AttendanceSeeder extends Seeder
                 'photo_in' => 'dummy_photo.jpg'
             ]);
         }
+
+        $faker = \Faker\Factory::create('id_ID');
+        $users = User::where('email', '!=', 'admin@gmail.com')->get();
+
+        if ($users->count() > 0) {
+            for ($i = 0; $i < 50; $i++) {
+                $randomUser = $users->random();
+                Attendance::create([
+                    'user_id' => $randomUser->id,
+                    'date' => $faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
+                    'time_in' => $faker->time('H:i:s', '08:00:00'),
+                    'time_out' => $faker->time('H:i:s', '17:00:00'),
+                    'status' => $faker->randomElement(['hadir', 'alpa', 'izin', 'sakit', 'cuti', 'dinas_luar']),
+                    'lat_in' => $faker->latitude(-11, 6),
+                    'long_in' => $faker->longitude(95, 141),
+                    'photo_in' => null
+                ]);
+            }
+        }
     }
 }

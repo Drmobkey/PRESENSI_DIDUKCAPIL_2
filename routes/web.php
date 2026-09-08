@@ -91,6 +91,9 @@ Route::middleware(['auth', 'check.status'])->group(function () {
             Route::delete('/{permission}', 'destroy')->middleware('permission:setup.permissions.destroy')->name('destroy');
         });
 
+    // Halaman aksi presensi (semua user login boleh akses, bukan hanya yang punya permission attendances.index)
+    Route::get('/presensi', [AttendanceController::class, 'checkPage'])->name('attendances.check-page');
+
     Route::post('/attendances/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.check-in');
     Route::post('/attendances/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.check-out');
 
@@ -124,6 +127,7 @@ Route::middleware(['auth', 'check.status'])->group(function () {
             Route::get('/{logbook}', 'show')->middleware('permission:logbooks.show')->name('show');
             Route::post('/', 'store')->middleware('permission:logbooks.store')->name('store');
             Route::match(['put', 'patch'], '/{logbook}', 'update')->middleware('permission:logbooks.update')->name('update');
+            Route::match(['put', 'patch'], '/{logbook}/status', 'updateStatus')->middleware('permission:logbooks.update')->name('updateStatus');
             Route::delete('/{logbook}', 'destroy')->middleware('permission:logbooks.destroy')->name('destroy');
         });
 

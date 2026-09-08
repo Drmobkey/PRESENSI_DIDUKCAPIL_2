@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Services\AttendanceService;
 use App\Http\Requests\Attendance\StoreCheckInRequest;
 use App\Http\Requests\Attendance\StoreCheckOutRequest;
@@ -15,6 +16,18 @@ class AttendanceController extends Controller
     public function __construct(AttendanceService $attendanceService)
     {
         $this->attendanceService = $attendanceService;
+    }
+
+    /**
+     * Menampilkan halaman aksi Check In / Check Out untuk user yang sedang login.
+     */
+    public function checkPage(Request $request)
+    {
+        $todayAttendance = Attendance::where('user_id', $request->user()->id)
+            ->where('date', now()->toDateString())
+            ->first();
+
+        return view('attendances.check-page', compact('todayAttendance'));
     }
 
     public function checkIn(StoreCheckInRequest $request)
@@ -66,13 +79,20 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         try {
-            // Data difilter otomatis oleh Service berdasarkan permission[cite: 1]
-            $attendances = $this->attendanceService->getAttendances($request->user());
+            // Data difilter otomatis oleh Service berdasarkan permission dan request filters
+            $filters = $request->only(['user_id', 'start_date', 'end_date', 'status', 'tpdk_id']);
+            $attendances = $this->attendanceService->getAttendances($request->user(), $filters);
+
+            $users = [];
+            if ($request->user()->can('attendances.view_all')) {
+                $users = \App\Models\User::all();
+            }
+            $tpdks = \App\Models\Tpdk::all();
 
             if ($request->expectsJson()) {
                 return response()->json(['success' => true, 'data' => $attendances], 200);
             }
-            return view('attendances.index', compact('attendances'));
+            return view('attendances.index', compact('attendances', 'users', 'tpdks'));
 
         } catch (\Exception $e) {
             Log::error('Error get attendances: ' . $e->getMessage());

@@ -15,7 +15,9 @@ class Logbook extends Model
     protected $fillable = [
         'user_id',
         'date',
-        'description'
+        'description',
+        'status',
+        'rejection_note'
     ];
 
     public function User()
