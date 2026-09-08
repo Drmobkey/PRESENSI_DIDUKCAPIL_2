@@ -20,6 +20,42 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'check.status'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard.index');
+    })->name('dashboard');
+
+    // Template Demo Pages
+    Route::get('/tables', function () {
+        return view('pages.tables');
+    })->name('tables');
+    Route::get('/billing', function () {
+        return view('pages.billing');
+    })->name('billing');
+    Route::get('/virtual-reality', function () {
+        return view('pages.virtual-reality');
+    })->name('virtual-reality');
+    Route::get('/rtl', function () {
+        return view('pages.rtl');
+    })->name('rtl');
+    Route::get('/notifications', function () {
+        return view('pages.notifications');
+    })->name('notifications');
+    Route::get('/profile', function () {
+        return view('pages.profile');
+    })->name('profile');
+    Route::get('/user-profile', function () {
+        return view('pages.laravel-examples.user-profile');
+    })->name('user-profile');
+    // Route::get('/user-management', function () {
+    //     return view('pages.laravel-examples.user-management');
+    // })->name('user-management');
+    Route::get('/static-sign-in', function () {
+        return view('pages.static-sign-in');
+    })->name('static-sign-in');
+    Route::get('/static-sign-up', function () {
+        return view('pages.static-sign-up');
+    })->name('static-sign-up');
+
     Route::prefix('setup/users')
         ->name('setup.users.')
         ->controller(UserController::class)

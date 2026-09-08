@@ -8,6 +8,7 @@ use App\Services\RoleService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -26,6 +27,10 @@ class RoleController extends Controller
         try {
             $roles = $this->roleService->getAllRoles();
 
+            $permissions = Permission::all()->groupBy(function ($perm) {
+                return explode('.', $perm->name)[0];
+            });
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
@@ -34,7 +39,7 @@ class RoleController extends Controller
                 ], 200);
             }
 
-            return view('roles.index', compact('roles'));
+            return view('Setup.Role.index', compact('roles', 'permissions'));
         } catch (\Exception $e) {
             Log::error('Error get all roles: ' . $e->getMessage());
 
@@ -75,7 +80,7 @@ class RoleController extends Controller
                 ], 201);
             }
 
-            return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan');
+            return redirect()->route('setup.roles.index')->with('success', 'Role berhasil ditambahkan');
         } catch (\Exception $e) {
             Log::error('Error create role: ' . $e->getMessage());
 
@@ -105,7 +110,7 @@ class RoleController extends Controller
                 ], 200);
             }
 
-            return view('roles.show', compact('role'));
+            return view('Setup.Role.show', compact('role'));
 
 
 
@@ -147,7 +152,7 @@ class RoleController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('roles.index')->with('success', 'Role berhasil diperbarui');
+            return redirect()->route('setup.roles.index')->with('success', 'Role berhasil diperbarui');
         } catch (\Exception $e) {
             Log::error('Error update role: ' . $e->getMessage());
 
@@ -178,7 +183,7 @@ class RoleController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('roles.index')->with('success', 'Role berhasil dihapus');
+            return redirect()->route('setup.roles.index')->with('success', 'Role berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error delete role' . $e->getMessage());
 

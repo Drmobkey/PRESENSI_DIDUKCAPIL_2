@@ -24,10 +24,11 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
             'status' => 'sometimes|in:pending,approved,rejected',
-            'primary_tpdk_id' => 'required|exists:tpdk,id',
+            'tpdk_id' => 'nullable|exists:tpdk,id',
+            'primary_tpdk_id' => 'nullable|exists:tpdk,id',
             'role' => 'sometimes|exists:roles,name'
         ];
     }

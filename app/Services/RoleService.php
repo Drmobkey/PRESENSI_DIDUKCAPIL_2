@@ -14,8 +14,14 @@ class RoleService
 
     public function createRole(array $data)
     {
+        $permissions = $data['permissions'] ?? [];
+        unset($data['permissions']); // Hapus dari array agar tidak error saat create
+
         $data['guard_name'] = $data['guard_name'] ?? 'web';
-        return Role::create($data);
+        $role = Role::create($data);
+
+        $role->syncPermissions($permissions); // Sinkronisasi otomatis Spatie
+        return $role;
     }
 
     public function getRoleById($id)
@@ -25,7 +31,12 @@ class RoleService
 
     public function updateRole(Role $role, array $data)
     {
+        $permissions = $data['permissions'] ?? [];
+        unset($data['permissions']);
+
         $role->update($data);
+        $role->syncPermissions($permissions);
+
         return $role;
 
     }

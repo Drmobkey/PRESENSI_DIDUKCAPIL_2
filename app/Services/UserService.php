@@ -33,8 +33,12 @@ class UserService
 
     public function createUser(array $data)
     {
-        $data['password'] = Hash::make(($data['password']));
+        $data['password'] = Hash::make($data['password']);
         $data['status'] = $data['status'] ?? 'pending';
+
+        if (isset($data['primary_tpdk_id']) && !isset($data['tpdk_id'])) {
+            $data['tpdk_id'] = $data['primary_tpdk_id'];
+        }
 
         $user = User::create($data);
 
@@ -43,13 +47,18 @@ class UserService
         }
 
         return $user;
-
     }
 
     public function updateUser(User $user, array $data)
     {
-        if (isset($data['password'])) {
+        if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        if (isset($data['primary_tpdk_id']) && !isset($data['tpdk_id'])) {
+            $data['tpdk_id'] = $data['primary_tpdk_id'];
         }
 
         $user->update($data);
@@ -59,14 +68,19 @@ class UserService
         }
 
         return $user;
+    }
 
+    public function rejectUser(User $user)
+    {
+        $user->update([
+            'status' => 'rejected'
+        ]);
+
+        return $user;
     }
 
     public function deleteUser(User $user)
     {
         return $user->delete();
-
     }
-
-
 }

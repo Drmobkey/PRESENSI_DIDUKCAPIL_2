@@ -51,7 +51,12 @@ class User extends Authenticatable
 
     public function primary_tpdk()
     {
-        return $this->belongsTo(Tpdk::class);
+        return $this->belongsTo(Tpdk::class, 'tpdk_id');
+    }
+
+    public function tpdk()
+    {
+        return $this->belongsTo(Tpdk::class, 'tpdk_id');
     }
     public function leaves()
     {

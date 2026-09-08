@@ -17,15 +17,19 @@ class CheckUserStatus
     {
         $user = $request->user();
         if ($user && $user->status !== 'approved') {
+            auth()->logout();
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Akun Anda berstatus ' . $user->status . ' dan tidak dapat mengakses fitur ini.'
                 ], 403);
             }
-        }
 
-        auth()->logout();
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akun Anda berstatus ' . $user->status . ' dan belum dapat mengakses sistem.'
+            ]);
+        }
 
         return $next($request);
     }

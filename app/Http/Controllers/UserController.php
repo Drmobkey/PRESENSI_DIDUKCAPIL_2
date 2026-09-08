@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Models\Tpdk;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -35,7 +37,7 @@ class UserController extends Controller
                 ], 200);
             }
 
-            return redirect()->back()->with('success', 'User berhasil disetujui.');
+            return redirect()->route('setup.users.index')->with('success', 'User berhasil disetujui dan akses TPDK telah diatur.');
 
 
         } catch (\Exception $e) {
@@ -51,6 +53,35 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Gagal menyetujui user.');
         }
     }
+
+    public function reject(Request $request, User $user)
+    {
+        try {
+            $this->userService->rejectUser($user);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User berhasil ditolak.'
+                ], 200);
+            }
+
+            return redirect()->route('setup.users.index')->with('success', 'User berhasil ditolak.');
+
+        } catch (\Exception $e) {
+            Log::error('Error reject user: ' . $e->getMessage());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat menolak user.'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Gagal menolak user.');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -66,7 +97,10 @@ class UserController extends Controller
                 ], 200);
             }
 
-            return view('users.index', compact('users'));
+            $roles = Role::all();
+            $tpdks = Tpdk::all();
+
+            return view('Setup.User.index', compact('users', 'roles', 'tpdks'));
         } catch (\Exception $e) {
             Log::error('Error get users: ' . $e->getMessage());
 
@@ -105,7 +139,7 @@ class UserController extends Controller
                 ], 201);
             }
 
-            return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan');
+            return redirect()->route('setup.users.index')->with('success', 'User berhasil ditambahkan');
 
         } catch (\Exception $e) {
 
@@ -154,7 +188,7 @@ class UserController extends Controller
                 ], 500);
             }
 
-            return redirect()->route('users.index')->with('error', 'Gagal memuat detail user');
+            return redirect()->route('setup.users.index')->with('error', 'Gagal memuat detail user');
         }
     }
 
@@ -183,7 +217,7 @@ class UserController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
+            return redirect()->route('setup.users.index')->with('success', 'User berhasil diperbarui');
 
         } catch (\Exception $e) {
             Log::error('Error update user:' . $e->getMessage());
@@ -216,7 +250,7 @@ class UserController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('users.index')->with('success', 'User berhasil dihapus');
+            return redirect()->route('setup.users.index')->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error delete user' . $e->getMessage());
 

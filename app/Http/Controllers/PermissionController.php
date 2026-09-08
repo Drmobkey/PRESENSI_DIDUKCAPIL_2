@@ -27,17 +27,17 @@ class PermissionController extends Controller
     public function index(Request $request)
     {
         try {
-            $permission = $this->permissionService->getAllPermission();
+            $permissions = $this->permissionService->getAllPermission();
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Daftar permission berhasil diambil',
-                    'data' => $permission,
+                    'data' => $permissions,
                 ], 200);
             }
 
-            return view('permission.index', compact('permission'));
+            return view('Setup.Permission.index', compact('permissions'));
         } catch (\Exception $e) {
             Log::error('Error get all permission' . $e->getMessage());
 
@@ -76,7 +76,7 @@ class PermissionController extends Controller
                 ], 200);
 
             }
-            return redirect()->route('permission.index')->with('success', 'Permission berhasil dibuat');
+            return redirect()->route('setup.permissions.index')->with('success', 'Permission berhasil dibuat');
         } catch (\Exception $e) {
             Log::error('Error create permission:' . $e->getMessage());
 
@@ -106,7 +106,7 @@ class PermissionController extends Controller
                 ], 200);
             }
 
-            return view('permission.show', compact('permission'));
+            return view('Setup.Permission.show', compact('permission'));
         } catch (\Exception $e) {
             Log::error(('Error get permission: ' . $e->getMessage()));
             if ($request->expectsJson()) {
@@ -147,7 +147,7 @@ class PermissionController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('permission.index')->with('success', 'Permission berhasil diperbarui');
+            return redirect()->route('setup.permissions.index')->with('success', 'Permission berhasil diperbarui');
         } catch (\Exception $e) {
             Log::error('Error update permission:' . $e->getMessage());
             if ($request->expectsJson()) {
@@ -179,7 +179,7 @@ class PermissionController extends Controller
                 ], 200);
             }
 
-            return redirect()->route('permission.index')->with('success', 'Permission berhasil dihapus');
+            return redirect()->route('setup.permissions.index')->with('success', 'Permission berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error delete permission' . $e->getMessage());
 
