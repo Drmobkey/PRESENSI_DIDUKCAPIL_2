@@ -26,7 +26,7 @@ class StoreCheckOutRequest extends FormRequest
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'photo_out' => 'required|image|max:2048',
-            'logbook_description' => 'required|string|min:10'
+            'logbook_description' => 'nullable|string|min:10'
         ];
     }
 }

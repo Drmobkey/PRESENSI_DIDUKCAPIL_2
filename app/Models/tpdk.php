@@ -20,10 +20,11 @@ class Tpdk extends Model
         'alamat'
     ];
 
-    // public function users()
-    // {
-    //     return $this->belongsToMany(User::class, 'tpdk_user');
-    // }
+    public function users()
+    {
+        // Relasi untuk mencari user yang mendaftar di TPDK ini
+        return $this->hasMany(User::class, 'tpdk_id');
+    }
 
     public function Attendance()
     {

@@ -34,10 +34,12 @@
                                 <h6 class="text-white text-capitalize ps-3 mb-0"><strong>Daftar TPDK (Titik
                                         Cabang)</strong></h6>
                                 <!-- Tombol Tambah memanggil Modal Create -->
-                                <button type="button" class="btn btn-success btn-sm mb-0 me-3 shadow-sm"
-                                    data-bs-toggle="modal" data-bs-target="#createTpdkModal">
-                                    <i class="material-icons text-sm">add</i> Tambah TPDK
-                                </button>
+                                @can('tpdks.store')
+                                    <button type="button" class="btn btn-success btn-sm mb-0 me-3 shadow-sm"
+                                        data-bs-toggle="modal" data-bs-target="#createTpdkModal">
+                                        <i class="material-icons text-sm">add</i> Tambah TPDK
+                                    </button>
+                                @endcan
                             </div>
                         </div>
 
@@ -96,18 +98,22 @@
                                                         <i class="material-icons text-lg">visibility</i>
                                                     </button>
                                                     <!-- Tombol Edit memanggil Modal Edit sesuai ID -->
-                                                    <button type="button" class="btn btn-link text-dark p-2 mb-0"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#editTpdkModal-{{ $tpdk->id }}" title="Edit TPDK">
-                                                        <i class="material-icons text-lg">edit</i>
-                                                    </button>
+                                                    @can('tpdks.update')
+                                                        <button type="button" class="btn btn-link text-dark p-2 mb-0"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editTpdkModal-{{ $tpdk->id }}" title="Edit TPDK">
+                                                            <i class="material-icons text-lg">edit</i>
+                                                        </button>
+                                                    @endcan
                                                     <!-- Tombol Hapus memanggil Modal Delete sesuai ID -->
-                                                    <button type="button" class="btn btn-link text-danger p-2 mb-0"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#deleteTpdkModal-{{ $tpdk->id }}"
-                                                        title="Hapus TPDK">
-                                                        <i class="material-icons text-lg">delete</i>
-                                                    </button>
+                                                    @can('tpdks.destroy')
+                                                        <button type="button" class="btn btn-link text-danger p-2 mb-0"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteTpdkModal-{{ $tpdk->id }}"
+                                                            title="Hapus TPDK">
+                                                            <i class="material-icons text-lg">delete</i>
+                                                        </button>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty

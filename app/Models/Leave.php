@@ -19,7 +19,8 @@ class Leave extends Model
         'end_date',
         'reason',
         'attachment',
-        'status'
+        'status',
+        'rejection_note',
     ];
 
     public function user()

@@ -27,6 +27,8 @@ class Attendance extends Model
             'photo_in',
             'photo_out',
             'status',
+            'is_late',
+            'late_duration',
 
         ];
 
@@ -45,5 +47,21 @@ class Attendance extends Model
         return Logbook::where('user_id', $this->user_id)
             ->whereDate('date', $this->date)
             ->first();
+    }
+
+    public function getFormattedLateDurationAttribute()
+    {
+        if (!$this->late_duration) return null;
+        
+        $hours = floor($this->late_duration / 60);
+        $minutes = $this->late_duration % 60;
+        
+        if ($hours > 0 && $minutes > 0) {
+            return "{$hours} Jam {$minutes} Menit";
+        } elseif ($hours > 0) {
+            return "{$hours} Jam";
+        } else {
+            return "{$minutes} Menit";
+        }
     }
 }

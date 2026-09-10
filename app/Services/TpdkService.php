@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Tpdk;
+use App\Models\User;
 use Exception;
 
 class TpdkService
@@ -31,5 +32,6 @@ class TpdkService
         }
 
         return $tpdk->delete();
+
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tpdk;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
@@ -15,11 +16,11 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $faker = \Faker\Factory::create('id_ID');
-        
+
         $roleAdmin = Role::firstOrCreate(['name' => 'Admin']);
         $roleUser = Role::firstOrCreate(['name' => 'User']);
 
-        $tpdk = \App\Models\Tpdk::first();
+        $tpdk = Tpdk::first();
 
         // Main Admin
         $admin = User::firstOrCreate(
@@ -46,7 +47,7 @@ class UserSeeder extends Seeder
         $pegawai->assignRole($roleUser);
 
         // Get all TPDK IDs
-        $tpdkIds = \App\Models\Tpdk::pluck('id')->toArray();
+        $tpdkIds = Tpdk::pluck('id')->toArray();
 
         // Generate 50 random users
         for ($i = 0; $i < 50; $i++) {

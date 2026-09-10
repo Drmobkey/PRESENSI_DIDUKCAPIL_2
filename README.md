@@ -1,58 +1,111 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="300" alt="Laravel Logo">
+  <br>
+  <h1>Sistem Informasi Manajemen Presensi (SIMAGA)</h1>
+  <p><b>Aplikasi Presensi Pegawai Berbasis Web dengan Geolocation & Camera Capture</b></p>
+  <p>Dikembangkan menggunakan <b>Laravel 11</b> dan <b>Material Dashboard 2</b>.</p>
+</div>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## ✨ Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **📍 Geolocation & Selfie Attendance**: Absensi cerdas yang mendeteksi lokasi (jarak radius ke titik kantor/TPDK) dilengkapi *capture* foto wajah secara real-time.
+- **📊 Real-time Dashboard**: Pantau kehadiran pegawai, tingkat keterlambatan, pengajuan cuti, dan statistik aktivitas harian dalam bentuk *chart* yang interaktif.
+- **🕒 Work Schedule Management**: Penjadwalan masuk dan keluar kerja yang dinamis, otomatis menghitung status Terlambat beserta durasinya (dalam jam dan menit).
+- **🏢 Multi TPDK (Lokasi Kantor)**: Mendukung absensi dari berbagai cabang / titik lokasi yang didaftarkan.
+- **📝 Pengajuan Izin & Cuti**: Sistem persetujuan berjenjang untuk pegawai yang mengajukan Izin, Sakit, Cuti, atau Dinas Luar.
+- **📔 Logbook Pegawai**: Catatan aktivitas harian pegawai yang dapat di-*review* oleh atasan.
+- **📥 Export Data**: Cetak laporan presensi, logbook, dan izin ke dalam format **PDF** dan **Excel**.
+- **🔐 Role & Permission System**: Hak akses (Admin, Superadmin, Pegawai) yang ketat berbasis Spatie Laravel Permission.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📸 Tampilan Aplikasi (Screenshots)
 
-## Learning Laravel
+Berikut adalah beberapa tangkapan layar dari sistem SIMAGA:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🏠 Dashboard Utama
+Menampilkan statistik kehadiran hari ini, bulan ini, serta tugas-tugas yang menunggu persetujuan (Izin & Logbook).
+![Dashboard](public/screenshot/Dashboard.png)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📸 Halaman Presensi (Check-in/Check-out)
+Membutuhkan akses lokasi dan kamera untuk validasi titik presensi.
+![Halaman Presensi](public/screenshot/Halaman%20Presensi.png)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 📋 Data Presensi & Export
+Laporan presensi lengkap dengan durasi keterlambatan yang bisa diekspor.
+![Data Presensi](public/screenshot/Data%20Presensi.png)
 
-## Agentic Development
+### 📝 Halaman Izin & Logbook
+![Halaman Izin](public/screenshot/Halaman%20Izin.png)
+<br>
+![Logbook](public/screenshot/Logbook.png)
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### ⚙️ Pengaturan Sistem (Admin)
+Manajemen Pengguna, Jabatan, Lokasi Presensi (TPDK), dan Jadwal Kerja.
+![User Management](public/screenshot/User%20Management.png)
+<br>
+![Tempat Presensi](public/screenshot/Tempat%20Presensi.png)
+<br>
+![Work Schedule](public/screenshot/Work%20Schedule.png)
 
-```bash
-composer require laravel/boost --dev
+### 🔑 Autentikasi
+![Login](public/screenshot/Login.png)
 
-php artisan boost:install
-```
+---
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## 🚀 Cara Instalasi
 
-## Contributing
+1. **Clone Repository**
+   ```bash
+   git clone <url-repo-anda>
+   cd presensi-disdukcapil
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Install Dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
 
-## Code of Conduct
+3. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   *Atur konfigurasi koneksi database Anda di file `.env`.*
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. **Migrasi Database & Seeder**
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+   *Perintah ini akan membuat struktur database dan membuat akun default (Superadmin, Admin, User).*
 
-## Security Vulnerabilities
+5. **Symlink Storage (Untuk Foto Presensi)**
+   ```bash
+   php artisan storage:link
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6. **Jalankan Aplikasi**
+   ```bash
+   npm run dev
+   php artisan serve
+   ```
+   *Akses di browser melalui `http://localhost:8000` atau `http://presensi-disdukcapil.test` jika menggunakan Laravel Herd.*
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🛠️ Teknologi yang Digunakan
+
+- **Backend**: Laravel 11.x, PHP 8.2+
+- **Frontend**: Blade Templating, Bootstrap 5, Material Dashboard 2
+- **Database**: PostgreSQL / MySQL
+- **Packages**: 
+  - `spatie/laravel-permission` (Role & Permission)
+  - `maatwebsite/excel` (Export Excel)
+  - `barryvdh/laravel-dompdf` (Export PDF)
+  - `SweetAlert2` (UI Alerts)
+
+---
+<p align="center">Dibuat dengan ❤️ untuk meningkatkan efisiensi dan transparansi birokrasi pemerintahan.</p>

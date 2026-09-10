@@ -64,7 +64,7 @@ class TpdkController extends Controller
                 ], 201);
             }
 
-            return redirect()->route('tpdk.index')->with('success', 'Titik TPDK berhasil ditambahkan');
+            return redirect()->route('tpdks.index')->with('success', 'Titik TPDK berhasil ditambahkan');
         } catch (\Exception $e) {
             Log::error('Error create TPDK: ' . $e->getMessage());
             return $this->handleError($request, 'Gagal menambahkan titik TPDK: ' . $e->getMessage(), 500);

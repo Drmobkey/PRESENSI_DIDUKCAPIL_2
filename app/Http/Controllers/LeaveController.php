@@ -8,6 +8,9 @@ use App\Http\Requests\Leave\StoreLeaveRequest;
 use App\Http\Requests\Leave\UpdateLeaveRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LeavesExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LeaveController extends Controller
 {
@@ -23,7 +26,9 @@ class LeaveController extends Controller
     public function index(Request $request)
     {
         try {
-            $leaves = $this->leaveService->getLeaves($request->user());
+            $filters = $request->only(['user_id', 'status', 'type', 'start_date', 'end_date']);
+            $leaves = $this->leaveService->getLeaves($request->user(), $filters);
+            $users = \App\Models\User::orderBy('name')->get();
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -33,13 +38,28 @@ class LeaveController extends Controller
                 ], 200);
             }
 
-            return view('leaves.index', compact('leaves'));
+            return view('leaves.index', compact('leaves', 'users'));
 
 
         } catch (\Exception $e) {
             Log::error('Error get leaves: ' . $e->getMessage());
             return $this->handleError($request, 'Gagal mengambil data pengajuan izin.', 500);
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $filters = $request->only(['user_id', 'status', 'type', 'start_date', 'end_date']);
+        $leaves = $this->leaveService->getLeaves($request->user(), $filters, false);
+        return Excel::download(new LeavesExport($leaves), 'Laporan_Izin_'.date('Ymd').'.xlsx');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filters = $request->only(['user_id', 'status', 'type', 'start_date', 'end_date']);
+        $leaves = $this->leaveService->getLeaves($request->user(), $filters, false);
+        $pdf = Pdf::loadView('leaves.export-pdf', ['data' => $leaves]);
+        return $pdf->download('Laporan_Izin_'.date('Ymd').'.pdf');
     }
 
     /**
@@ -170,26 +190,31 @@ class LeaveController extends Controller
         }
     }
 
-    public function approve(Request $request, Leave $leave)
+    public function updateStatus(Request $request, Leave $leave)
     {
         $user = $request->user();
 
         // Hanya Admin/Superadmin yang boleh mengeksekusi ini
         if (!$user->can('leaves.manage_all') && !$user->can('leaves.manage_branch')) {
-            return $this->handleError($request, 'Anda tidak memiliki wewenang menyetujui izin.', 403);
+            return $this->handleError($request, 'Anda tidak memiliki wewenang mengubah status izin.', 403);
         }
 
+        $request->validate([
+            'status' => 'required|in:approved,rejected',
+            'rejection_note' => 'nullable|string'
+        ]);
+
         try {
-            $approvedLeave = $this->leaveService->approvalLeave($leave);
+            $updatedLeave = $this->leaveService->updateStatus($leave, $request->status, $request->rejection_note);
 
             if ($request->expectsJson()) {
-                return response()->json(['success' => true, 'message' => 'Izin disetujui', 'data' => $approvedLeave], 200);
+                return response()->json(['success' => true, 'message' => 'Status izin diperbarui', 'data' => $updatedLeave], 200);
             }
-            return redirect()->back()->with('success', 'Pengajuan izin berhasil disetujui.');
+            return redirect()->back()->with('success', 'Status izin berhasil diperbarui.');
 
         } catch (\Exception $e) {
-            Log::error('Error approve leave: ' . $e->getMessage());
-            return $this->handleError($request, 'Gagal menyetujui pengajuan izin.', 500);
+            Log::error('Error update status leave: ' . $e->getMessage());
+            return $this->handleError($request, 'Gagal memperbarui status izin.', 500);
         }
     }
 

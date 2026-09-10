@@ -35,13 +35,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="input-group input-group-outline mb-4 is-filled">
-                            <label class="form-label">Alasan Detail</label>
+                        <div class="input-group input-group-outline mb-4 ">
                             <textarea name="reason" class="form-control" rows="3" required>{{ $leave->reason }}</textarea>
                         </div>
-                        <div class="input-group input-group-static mb-3">
-                            <label>Lampiran Baru (Biarkan kosong jika tidak ingin mengubah)</label>
-                            <input type="file" name="attachment" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+                        <div class="mb-4">
+                            <label class="form-label text-sm font-weight-bold text-dark">
+                                Lampiran Baru
+                            </label>
+                            <!-- Hapus class input-group, tambahkan border dan padding -->
+
+                            <input type="file" name="attachment" class="form-control border border-2 p-2"
+                                accept=".jpg,.jpeg,.png,.pdf">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -53,3 +57,9 @@
         </div>
     </div>
 @endforeach
+
+<style>
+    input[type="file"]::file-selector-button {
+        margin-right: 15px;
+    }
+</style>

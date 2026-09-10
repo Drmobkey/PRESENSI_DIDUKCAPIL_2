@@ -8,8 +8,7 @@
             <form action="{{ route('logbooks.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <div class="input-group input-group-outline mb-3 is-filled">
-                        <label class="form-label">Deskripsi Pekerjaan</label>
+                    <div class="input-group input-group-outline mb-3 ">
                         <textarea name="description" class="form-control" rows="5" required minlength="10"
                             placeholder="Jelaskan pekerjaan Anda hari ini..."></textarea>
                     </div>

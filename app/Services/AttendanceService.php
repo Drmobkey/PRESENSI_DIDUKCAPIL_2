@@ -28,6 +28,13 @@ class AttendanceService
         $schedule = $this->workScheduleService->getTodaySchedule();
         $currentTime = Carbon::now()->format('H:i:s');
         $isLate = $currentTime > $schedule->start_time;
+        $lateDuration = null;
+
+        if ($isLate) {
+            $start = Carbon::parse($schedule->start_time);
+            $now = Carbon::now();
+            $lateDuration = (int) $start->diffInMinutes($now);
+        }
 
         $photoPath = $data['photo_in']->store('attendances', 'public');
 
@@ -40,6 +47,7 @@ class AttendanceService
             'long_in' => $data['longitude'],
             'photo_in' => $photoPath,
             'is_late' => $isLate,      // Injeksi status terlambat
+            'late_duration' => $lateDuration, // Durasi keterlambatan dalam menit
             'status' => 'hadir'        // Kunci status kehadiran
         ]);
     }
@@ -82,7 +90,7 @@ class AttendanceService
                     ->exists();
 
                 if (!$hasLogbook) {
-                    throw new \Exception("Anda belum mengisi logbook. Silakan isi logbook terlebih dahulu atau lengkapi saat Check-out.");
+                    throw new Exception("Anda belum mengisi logbook. Silakan isi logbook terlebih dahulu atau lengkapi saat Check-out.");
                 }
             }
 
@@ -90,7 +98,7 @@ class AttendanceService
         });
     }
 
-    public function getAttendances($user, array $filters = [])
+    public function getAttendances($user, array $filters = [], $paginate = true)
     {
         // Eager load relasi user dan tpdk untuk detail lengkap
         $query = Attendance::with(['user', 'tpdk']);
@@ -120,7 +128,11 @@ class AttendanceService
             $query->where('tpdk_id', $filters['tpdk_id']);
         }
 
-        return $query->latest()->paginate(10)->withQueryString();
+        if ($paginate) {
+            return $query->latest()->paginate(10)->withQueryString();
+        }
+
+        return $query->latest()->get();
     }
 
 

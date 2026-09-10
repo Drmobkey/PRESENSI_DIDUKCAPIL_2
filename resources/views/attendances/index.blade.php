@@ -40,11 +40,18 @@
                                 <h6 class="text-white text-capitalize ps-3 mb-0"><strong>Riwayat Presensi</strong></h6>
 
                                 <!-- Aksi check-in/check-out sudah dipindah ke halaman /presensi -->
-                                <a href="{{ route('attendances.check-page') }}"
-                                    class="btn btn-white btn-sm mb-0 shadow-sm me-3">
-                                    <i class="material-icons text-sm align-middle">fingerprint</i>&nbsp;&nbsp;Presensi
-                                    Saya
-                                </a>
+                                <div class="me-3">
+                                    <a href="{{ route('attendances.export.excel', request()->all()) }}" class="btn btn-success btn-sm mb-0 shadow-sm me-2">
+                                        <i class="material-icons text-sm align-middle">table_view</i> Excel
+                                    </a>
+                                    <a href="{{ route('attendances.export.pdf', request()->all()) }}" class="btn btn-danger btn-sm mb-0 shadow-sm me-2">
+                                        <i class="material-icons text-sm align-middle">picture_as_pdf</i> PDF
+                                    </a>
+                                    <a href="{{ route('attendances.check-page') }}"
+                                        class="btn btn-white btn-sm mb-0 shadow-sm">
+                                        <i class="material-icons text-sm align-middle">fingerprint</i> Presensi Saya
+                                    </a>
+                                </div>
                             </div>
                         </div>
 

@@ -3,7 +3,9 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title font-weight-normal">Detail Logbook - <strong>{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</strong></h5>
+                    <h5 class="modal-title font-weight-normal">Detail Logbook -
+                        <strong>{{ \Carbon\Carbon::parse($logbook->date)->format('d M Y') }}</strong>
+                    </h5>
                     <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -16,7 +18,7 @@
                         </tr>
                         <tr>
                             <th>Status</th>
-                            <td>: 
+                            <td>:
                                 @if($logbook->status == 'approved')
                                     <span class="badge badge-sm bg-gradient-success">Disetujui</span>
                                 @elseif($logbook->status == 'revision')
@@ -32,31 +34,39 @@
                                 <td class="text-danger">: {{ $logbook->rejection_note }}</td>
                             </tr>
                         @endif
-                        <tr>
-                            <th>Deskripsi</th>
-                            <td style="white-space: pre-wrap;">: {{ $logbook->description }}</td>
-                        </tr>
                     </table>
 
-                    @if(auth()->user()->can('view_all_data'))
+                    <div class="mt-3">
+                        <label class="form-label text-sm font-weight-bold">Deskripsi Pekerjaan:</label>
+                        <div class="p-3 bg-gray-100 rounded text-sm text-dark"
+                            style="white-space: pre-wrap; min-height: 80px;">{{ $logbook->description }}</div>
+                    </div>
+
+                    @if(auth()->user()->can('logbooks.manage_all'))
                         <hr class="horizontal dark mt-4 mb-4">
                         <form action="{{ route('logbooks.updateStatus', $logbook->id) }}" method="POST">
                             @csrf
                             @method('PUT')
-                            
+
                             <div class="form-group mb-3">
-                                <label class="form-label text-sm font-weight-bold">Tindakan Admin <span class="text-danger">*</span></label>
-                                <select name="status" class="form-select px-2 border" id="statusSelect-{{ $logbook->id }}" onchange="toggleRejectionNote('{{ $logbook->id }}')">
-                                    <option value="approved" {{ $logbook->status == 'approved' ? 'selected' : '' }}>Setujui</option>
-                                    <option value="revision" {{ $logbook->status == 'revision' ? 'selected' : '' }}>Minta Revisi</option>
+                                <label class="form-label text-sm font-weight-bold">Tindakan Admin <span
+                                        class="text-danger">*</span></label>
+                                <select name="status" class="form-select px-2 border" id="statusSelect-{{ $logbook->id }}"
+                                    onchange="toggleRejectionNote('{{ $logbook->id }}')">
+                                    <option value="approved" {{ $logbook->status == 'approved' ? 'selected' : '' }}>Setujui
+                                    </option>
+                                    <option value="revision" {{ $logbook->status == 'revision' ? 'selected' : '' }}>Minta Revisi
+                                    </option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group mb-3" id="rejectionNoteGroup-{{ $logbook->id }}" style="display: {{ $logbook->status == 'revision' ? 'block' : 'none' }};">
+
+                            <div class="form-group mb-3" id="rejectionNoteGroup-{{ $logbook->id }}"
+                                style="display: {{ $logbook->status == 'revision' ? 'block' : 'none' }};">
                                 <label class="form-label text-sm font-weight-bold">Catatan Revisi (Opsional)</label>
-                                <textarea name="rejection_note" class="form-control border px-2" rows="3">{{ $logbook->rejection_note }}</textarea>
+                                <textarea name="rejection_note" class="form-control border px-2"
+                                    rows="3">{{ $logbook->rejection_note }}</textarea>
                             </div>
-                            
+
                             <button type="submit" class="btn bg-gradient-primary w-100">Update Status Logbook</button>
                         </form>
                     @endif

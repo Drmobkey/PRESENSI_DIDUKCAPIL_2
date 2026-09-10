@@ -28,6 +28,9 @@ class PermissionService
 
     public function deletePermission(Permission $permission)
     {
+        if ($permission->roles()->count() > 0 || $permission->users()->count() > 0) {
+            throw new \Exception('Permission sedang digunakan oleh Role atau User dan tidak dapat dihapus.');
+        }
         $permission->delete();
     }
 

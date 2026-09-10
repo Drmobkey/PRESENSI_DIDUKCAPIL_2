@@ -2,8 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Logbook;
 use App\Services\LogbookService;
 use Illuminate\Http\Request;
+use App\Http\Requests\Logbook\StoreLogbookRequest;
+use App\Http\Requests\Logbook\UpdateLogbookRequest;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LogbooksExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LogbookController extends Controller
 {
@@ -20,17 +28,34 @@ class LogbookController extends Controller
     public function index(Request $request)
     {
         try {
-            $logbooks = $this->logbookService->getLogbooks($request->user());
+            $filters = $request->only(['user_id', 'status', 'start_date', 'end_date']);
+            $logbooks = $this->logbookService->getLogbooks($request->user(), $filters);
+            $users = User::orderBy('name')->get();
 
             if ($request->expectsJson()) {
                 return response()->json(['success' => true, 'data' => $logbooks], 200);
             }
-            return view('logbooks.index', compact('logbooks'));
+            return view('logbooks.index', compact('logbooks', 'users'));
 
         } catch (\Exception $e) {
             Log::error('Error get logbooks: ' . $e->getMessage());
             return $this->handleError($request, 'Gagal mengambil data logbook.', 500);
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $filters = $request->only(['user_id', 'status', 'start_date', 'end_date']);
+        $logbooks = $this->logbookService->getLogbooks($request->user(), $filters, false);
+        return Excel::download(new LogbooksExport($logbooks), 'Laporan_Logbook_'.date('Ymd').'.xlsx');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filters = $request->only(['user_id', 'status', 'start_date', 'end_date']);
+        $logbooks = $this->logbookService->getLogbooks($request->user(), $filters, false);
+        $pdf = Pdf::loadView('logbooks.export-pdf', ['data' => $logbooks]);
+        return $pdf->download('Laporan_Logbook_'.date('Ymd').'.pdf');
     }
 
     /**
@@ -68,7 +93,7 @@ class LogbookController extends Controller
 
         // Proteksi URL: Cegah User A mengintip logbook User B
         $isOwner = $logbook->user_id === $user->id;
-        $canViewAll = $user->can('view_all_data');
+        $canViewAll = $user->can('logbooks.manage_all');
 
         if (!$isOwner && !$canViewAll) {
             return $this->handleError($request, 'Anda tidak memiliki akses melihat logbook ini.', 403);
@@ -130,11 +155,11 @@ class LogbookController extends Controller
     public function destroy(Request $request, Logbook $logbook)
     {
         // Validasi ekstra: Hanya Superadmin/Admin atau Pemilik yang bisa menghapus
-        if (!$request->user()->can('view_all_data') && $logbook->user_id !== $request->user()->id) {
+        if (!$request->user()->can('logbooks.manage_all') && $logbook->user_id !== $request->user()->id) {
             return $this->handleError($request, 'Akses ditolak.', 403);
         }
 
-        if ($logbook->status !== 'pending' && !$request->user()->can('view_all_data')) {
+        if ($logbook->status !== 'pending' && !$request->user()->can('logbooks.manage_all')) {
             return $this->handleError($request, 'Hanya logbook dengan status pending yang dapat dihapus.', 403);
         }
 
@@ -153,7 +178,7 @@ class LogbookController extends Controller
 
     public function updateStatus(Request $request, Logbook $logbook)
     {
-        if (!$request->user()->can('view_all_data')) {
+        if (!$request->user()->can('logbooks.manage_all')) {
             return $this->handleError($request, 'Akses ditolak.', 403);
         }
 

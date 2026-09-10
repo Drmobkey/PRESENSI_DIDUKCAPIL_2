@@ -17,8 +17,7 @@
                             </div>
                         @endif
 
-                        <div class="input-group input-group-outline mb-3 is-filled">
-                            <label class="form-label">Deskripsi Pekerjaan <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-outline mb-3 ">
                             <textarea name="description" class="form-control" rows="5" required
                                 minlength="10">{{ $logbook->description }}</textarea>
                         </div>

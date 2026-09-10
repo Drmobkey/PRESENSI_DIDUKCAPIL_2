@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\WorkSchedule;
 use App\Services\AttendanceService;
 use App\Http\Requests\Attendance\StoreCheckInRequest;
 use App\Http\Requests\Attendance\StoreCheckOutRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AttendancesExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AttendanceController extends Controller
 {
@@ -27,7 +31,9 @@ class AttendanceController extends Controller
             ->where('date', now()->toDateString())
             ->first();
 
-        return view('attendances.check-page', compact('todayAttendance'));
+        $schedule = WorkSchedule::where('day_of_week', now()->dayOfWeek)->first();
+
+        return view('attendances.check-page', compact('todayAttendance', 'schedule'));
     }
 
     public function checkIn(StoreCheckInRequest $request)
@@ -104,6 +110,21 @@ class AttendanceController extends Controller
         }
     }
 
+    public function exportExcel(Request $request)
+    {
+        $filters = $request->only(['user_id', 'start_date', 'end_date', 'status', 'tpdk_id']);
+        $attendances = $this->attendanceService->getAttendances($request->user(), $filters, false);
+        return Excel::download(new AttendancesExport($attendances), 'Laporan_Presensi_' . date('Ymd') . '.xlsx');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filters = $request->only(['user_id', 'start_date', 'end_date', 'status', 'tpdk_id']);
+        $attendances = $this->attendanceService->getAttendances($request->user(), $filters, false);
+        $pdf = Pdf::loadView('attendances.export-pdf', ['data' => $attendances]);
+        return $pdf->download('Laporan_Presensi_' . date('Ymd') . '.pdf');
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -123,7 +144,7 @@ class AttendanceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, \App\Models\Attendance $attendance)
+    public function show(Request $request, Attendance $attendance)
     {
         $user = $request->user();
 

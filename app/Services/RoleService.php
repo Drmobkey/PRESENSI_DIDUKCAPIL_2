@@ -43,7 +43,9 @@ class RoleService
 
     public function deleteRole(Role $role)
     {
-
+        if ($role->users()->count() > 0) {
+            throw new \Exception('Role sedang digunakan oleh user dan tidak dapat dihapus.');
+        }
         $role->delete();
     }
 

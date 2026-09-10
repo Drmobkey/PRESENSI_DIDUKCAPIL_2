@@ -36,12 +36,17 @@
                         </div>
 
                         <!-- Or File Input -->
-                        <div class="text-center text-xs text-secondary mb-2">- ATAU PILIH BERKAS -</div>
+                        <div class="text-center text-xs text-secondary mb-3">- ATAU PILIH BERKAS -</div>
+                        
+                        <label for="checkout_photo_input" class="btn btn-outline-secondary w-100 mb-1" style="border-style: dashed; padding: 12px;">
+                            <i class="material-icons align-middle me-2">upload_file</i> 
+                            <span id="checkout_file_label">Klik untuk memilih gambar...</span>
+                        </label>
                         <input type="file" name="photo_out" id="checkout_photo_input" accept="image/*"
-                            capture="environment" class="form-control border border-2 p-2" required>
-                        <small class="text-secondary d-block mt-1 text-xs">Maks. 2MB, format gambar (jpg/png).</small>
+                            capture="environment" class="d-none" required>
+                        <small class="text-secondary d-block mt-1 text-xs text-center">Maks. 2MB, format gambar (jpg/png).</small>
                         @error('photo_out')
-                            <div class="text-danger text-xs mt-1">{{ $message }}</div>
+                            <div class="text-danger text-xs mt-1 text-center">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -98,7 +103,11 @@
             checkoutSnapBtn.style.display = 'block';
             checkoutStartCamBtn.style.display = 'none';
         } catch (err) {
-            alert("Tidak dapat mengakses kamera. Pastikan browser memiliki izin kamera.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: "Tidak dapat mengakses kamera. Pastikan browser memiliki izin kamera.",
+            });
         }
     });
 
@@ -148,6 +157,7 @@
     checkoutPhotoInput.addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
+            document.getElementById('checkout_file_label').textContent = file.name;
             checkoutPreviewImg.src = URL.createObjectURL(file);
             checkoutPreviewWrapper.style.display = 'block';
             // Stop stream if file is chosen manually while cam is on
@@ -158,6 +168,7 @@
                 checkoutStartCamBtn.style.display = 'block';
             }
         } else {
+            document.getElementById('checkout_file_label').textContent = 'Klik untuk memilih gambar...';
             checkoutPreviewWrapper.style.display = 'none';
             checkoutRetakeBtn.style.display = 'none';
         }

@@ -12,7 +12,7 @@ class GeolocationService
      * Mengembalikan jarak dalam satuan meter.
      */
 
-    private function calculateDistance($lat1, $lat2, $lon1, $lon2)
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
         // Jari-jari bumi dalam meter
         $earthRadius = 6371000;

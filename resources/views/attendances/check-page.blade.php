@@ -53,12 +53,12 @@
                             <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-5 px-3">
                                 <button type="button"
                                     class="btn btn-success btn-lg shadow-sm w-100 rounded-pill fs-6 py-3 {{ $todayAttendance ? 'opacity-50' : '' }}"
-                                    data-bs-toggle="modal" data-bs-target="#checkInModal" {{ $todayAttendance ? 'disabled' : '' }}>
+                                    id="btnCheckIn" {{ $todayAttendance ? 'disabled' : '' }}>
                                     <i class="material-icons align-middle me-2">login</i> Check In
                                 </button>
                                 <button type="button"
                                     class="btn btn-warning btn-lg shadow-sm w-100 rounded-pill fs-6 py-3 text-white {{ (!$todayAttendance || $todayAttendance->time_out) ? 'opacity-50' : '' }}"
-                                    data-bs-toggle="modal" data-bs-target="#checkOutModal" {{ (!$todayAttendance || $todayAttendance->time_out) ? 'disabled' : '' }}>
+                                    id="btnCheckOut" {{ (!$todayAttendance || $todayAttendance->time_out) ? 'disabled' : '' }}>
                                     <i class="material-icons align-middle me-2">logout</i> Check Out
                                 </button>
                             </div>
@@ -71,7 +71,7 @@
                                                 Masuk</p>
                                             <h5 class="mb-0 text-dark">{{ $todayAttendance->time_in ?? '-' }}</h5>
                                             @if ($todayAttendance->is_late)
-                                                <span class="badge badge-sm bg-gradient-danger mt-2">Terlambat</span>
+                                                <span class="badge badge-sm bg-gradient-danger mt-2">Terlambat {{ $todayAttendance->formatted_late_duration ? '(' . $todayAttendance->formatted_late_duration . ')' : '' }}</span>
                                             @else
                                                 <span class="badge badge-sm bg-gradient-success mt-2">Tepat Waktu</span>
                                             @endif
@@ -178,6 +178,73 @@
         document.getElementById('checkOutModal').addEventListener('show.bs.modal', function () {
             fetchLocation('checkout');
         });
+
+        // Validation for Check In Time
+        const btnCheckIn = document.getElementById('btnCheckIn');
+        if(btnCheckIn) {
+            btnCheckIn.addEventListener('click', function(e) {
+                @if($schedule)
+                    const currentTime = new Date();
+                    const startParts = "{{ $schedule->start_time }}".split(':');
+                    
+                    const startTime = new Date();
+                    startTime.setHours(parseInt(startParts[0]), parseInt(startParts[1]), parseInt(startParts[2] || 0), 0);
+                    
+                    // Batas paling awal check in (misal 2 jam sebelum jam masuk)
+                    const earliestCheckIn = new Date(startTime.getTime() - (2 * 60 * 60 * 1000));
+                    
+                    if (currentTime < earliestCheckIn) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Belum Waktunya',
+                            text: "Anda baru bisa Check In mulai pukul " + earliestCheckIn.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) + ".",
+                        });
+                    } else {
+                        // Show modal
+                        const modal = new bootstrap.Modal(document.getElementById('checkInModal'));
+                        modal.show();
+                    }
+                @else
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: "Jadwal operasional belum diatur hari ini.",
+                    });
+                @endif
+            });
+        }
+
+        // Validation for Check Out Time
+        const btnCheckOut = document.getElementById('btnCheckOut');
+        if(btnCheckOut) {
+            btnCheckOut.addEventListener('click', function(e) {
+                @if($schedule)
+                    const currentTime = new Date();
+                    const endParts = "{{ $schedule->end_time }}".split(':');
+                    
+                    const endTime = new Date();
+                    endTime.setHours(parseInt(endParts[0]), parseInt(endParts[1]), parseInt(endParts[2] || 0), 0);
+                    
+                    if (currentTime < endTime) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Belum Waktunya Pulang',
+                            text: "Jam kerja hari ini berakhir pukul {{ $schedule->end_time }}.",
+                        });
+                    } else {
+                        // Show modal
+                        const modal = new bootstrap.Modal(document.getElementById('checkOutModal'));
+                        modal.show();
+                    }
+                @else
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: "Jadwal operasional belum diatur hari ini.",
+                    });
+                @endif
+            });
+        }
     </script>
 
 </x-layout>
